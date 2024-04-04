@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Customer;
-use App\Http\Requests\StoreCustomerRequest;
+use App\Http\Requests\V1\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\CustomerResource;
@@ -21,17 +21,16 @@ class CustomerController extends Controller
     public function index(Request $request)
     {
         $filter = new CustomersFilter();
-        $queryItems = $filter->transform($request); //[['column', 'operator','value']]
+        $filterItems = $filter->transform($request); //[['column', 'operator','value']]
+        $includeInvoices = $request->query('includeInvoices');
+        $customers=Customer::where($filterItems);
 
-        if(count($queryItems) == 0){
-            return new CustomerCollection(Customer::paginate());
+        if($includeInvoices){
+            $customers = $customers->with('invoices');
         }
-        else {
-            $customers=Customer::where($queryItems)->paginate();
-            return new CustomerCollection($customers->appends($request->query()));
-
-        }
-
+        
+        return new CustomerCollection($customers->paginate()->appends($request->query()));
+      
        // Customer::where($queryItems);
 
         // Nothing todo with CustomerCollection, just create a new object and it automatically transform to new style
@@ -41,16 +40,7 @@ class CustomerController extends Controller
         
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
+    
     /**
      * Store a newly created resource in storage.
      *
@@ -59,7 +49,7 @@ class CustomerController extends Controller
      */
     public function store(StoreCustomerRequest $request)
     {
-        //
+        return new CustomerResource(Customer::create($request->all()));
     }
 
     /**
@@ -70,6 +60,11 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
+        $includeInvoices = request()->query('includeInvoices');
+
+        if($includeInvoices){
+            return new CustomerResource($customer->loadMissing('invoices'));
+        }
         return new CustomerResource($customer);
     }
 
