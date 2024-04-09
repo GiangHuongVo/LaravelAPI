@@ -22,7 +22,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 // api/v1
-Route::group(['prefix' => 'v1', 'namespace' => ''], function(){
+Route::group(['prefix' => 'v1', 'namespace' => '', 'middleware' => 'auth:sanctum'], function(){
     Route::apiResource('customers', CustomerController::class);
     Route::apiResource('invoices', InvoiceController::class);
     // store/create very large invoices route
