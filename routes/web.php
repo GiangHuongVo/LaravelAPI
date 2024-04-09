@@ -41,12 +41,12 @@ Route::get('/setup', function(){
             //Create 3 types of token
             $adminToken = $user->createToken('admin-token', ['create', 'update','delete']);
             $updateToken = $user->createToken('update-token', ['create', 'update']);
-            $basicToken = $user->createToken('basic-token');
+            $basicToken = $user->createToken('basic-token'); // it has all abilities * -> go to database change * to none
 
             return [
                 'admin'=>$adminToken->plainTextToken,
                 'update'=>$updateToken->plainTextToken,
-                'basic'=>$basicToken->plainTextToken
+                'basic'=>$basicToken->plainTextToken 
 
             ];
         }
