@@ -1,9 +1,3 @@
-
-
-<p align="center">
-   This is an API project
-</p>
-
 ## About LaravelAPI
 
 - Customer: create, update
