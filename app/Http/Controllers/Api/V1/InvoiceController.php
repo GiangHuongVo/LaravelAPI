@@ -56,6 +56,11 @@ class InvoiceController extends Controller
         //
     }
 
+    // to store very large invoces, using bulkStore method
+    public function bulkStore (Request $request){
+        //
+    }
+
     /**
      * Display the specified resource.
      *
