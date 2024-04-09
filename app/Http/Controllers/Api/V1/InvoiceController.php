@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Invoice;
-use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Requests\UpdateInvoiceRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V1\InvoiceResource;
 use App\Http\Resources\V1\InvoiceCollection;
 use App\Filters\V1\InvoicesFilter;
+use Illuminate\Support\Arr;
+use App\Http\Requests\V1\BulkStoreInvoiceRequest;
 
 class InvoiceController extends Controller
 {
@@ -48,17 +49,23 @@ class InvoiceController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreInvoiceRequest  $request
+     * @param  \App\Http\Requests\V1\BulkStoreInvoiceRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreInvoiceRequest $request)
+    public function store(BulkStoreInvoiceRequest $request)
     {
         //
     }
 
-    // to store very large invoces, using bulkStore method
-    public function bulkStore (Request $request){
-        //
+    // to store very large invoces, using bulkStore method => have to change api route
+    public function bulkStore (BulkStoreInvoiceRequest $request){
+        // if user insert with camel case, like  Invoice::insert('billedDate') => it has an error, because it is not the data type
+        // Have to validation the type data
+        $bulk = collect($request->all())->map(function($arr, $key){
+            return Arr::except($arr, ['customerId', 'billedDate', 'paidDate']);
+        });
+        //Now insert to database
+        Invoice::insert($bulk->toArray());
     }
 
     /**
@@ -86,11 +93,11 @@ class InvoiceController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateInvoiceRequest  $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateInvoiceRequest $request, Invoice $invoice)
+    public function update(Request $request, Invoice $invoice)
     {
         //
     }
